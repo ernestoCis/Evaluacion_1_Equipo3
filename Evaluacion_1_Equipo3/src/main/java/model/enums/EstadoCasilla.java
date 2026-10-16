@@ -9,5 +9,7 @@ package model.enums;
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
 public enum EstadoCasilla {
-    
+    SIN_DISPARAR,
+    IMPACTADA,
+    AGUA
 }

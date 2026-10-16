@@ -9,5 +9,18 @@ package model.enums;
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
 public enum TipoNave {
-    
+    PORTAAVION(4),
+    CRUCERO(3),
+    SUBMARINO(2),
+    BARCO(1);
+
+    private final int tamano;
+
+    TipoNave(int tamano) {
+        this.tamano = tamano;
+    }
+
+    public int getTamano() {
+        return tamano;
+    }
 }

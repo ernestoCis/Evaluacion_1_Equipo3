@@ -9,5 +9,6 @@ package model.enums;
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
 public enum Orientacion {
-    
+    VERTICAL,
+    HORIZONTAL
 }
