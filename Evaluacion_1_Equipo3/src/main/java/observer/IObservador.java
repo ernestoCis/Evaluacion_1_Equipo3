@@ -4,10 +4,12 @@
  */
 package observer;
 
+import model.IModel;
+
 /**
  *
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
 public interface IObservador {
-    
+    void update(IModel model);
 }

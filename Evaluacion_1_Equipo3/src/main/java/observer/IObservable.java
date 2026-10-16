@@ -9,5 +9,7 @@ package observer;
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
 public interface IObservable {
-    
+    void addObserver(IObservador o);
+    void removeObserver(IObservador o);
+    void notifyObservers();
 }
