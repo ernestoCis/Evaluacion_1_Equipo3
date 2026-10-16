@@ -4,10 +4,18 @@
  */
 package model;
 
+import model.enums.EstadoPartida;
+import model.enums.MotivoFin;
+
 /**
  *
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
 public interface IModel {
-    
+    EstadoPartida getEstado();
+    Jugador getJugadorTurno();
+    Tablero getTablero(Jugador jugador);
+    Jugador getGanador();
+    MotivoFin getMotivoFin();
+    int getTiempoRestante();
 }

@@ -4,10 +4,121 @@
  */
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+import model.enums.EstadoCasilla;
+import model.enums.ResultadoDisparo;
+
 /**
  *
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
-public class Tablero {
-    
+public class Tablero{
+    private int filas;
+    private int columnas;
+    private boolean confirmado;
+    private Casilla[][] casillas;
+    private List<Nave> naves;
+
+    public Tablero(int filas, int columnas) {
+        this.filas = filas;
+        this.columnas = columnas;
+        this.confirmado = false;
+        this.casillas = new Casilla[filas][columnas];
+        this.naves = new ArrayList<>();
+        inicializarCasillas();
+    }
+
+    private void inicializarCasillas() {
+        for (int f = 0; f < filas; f++) {
+            for (int c = 0; c < columnas; c++) {
+                casillas[f][c] = new Casilla(f, c);
+            }
+        }
+    }
+
+    public Casilla obtenerCasilla(int fila, int columna) {
+        if (validarRango(fila, columna)) {
+            return casillas[fila][columna];
+        }
+        return null;
+    }
+
+    public boolean validarRango(int fila, int columna) {
+        return fila >= 0 && fila < filas && columna >= 0 && columna < columnas;
+    }
+
+    public boolean validarDisparo(int fila, int columna) {
+        if (!validarRango(fila, columna)) return false;
+        Casilla c = obtenerCasilla(fila, columna);
+        return c.obtenerEstado() == EstadoCasilla.SIN_DISPARAR;
+    }
+
+    public ResultadoDisparo verificarImpacto(int fila, int columna) {
+        Casilla casilla = obtenerCasilla(fila, columna);
+        
+        for (Nave nave : naves) {
+            if (nave.ocupaCasilla(casilla)) {
+                casilla.cambiarEstado(EstadoCasilla.IMPACTADA);
+                boolean hundida = nave.recibirDisparo();
+                return hundida ? ResultadoDisparo.HUNDIDA : ResultadoDisparo.IMPACTO;
+            }
+        }
+        
+        casilla.cambiarEstado(EstadoCasilla.AGUA);
+        return ResultadoDisparo.AGUA;
+    }
+
+    public void agregarNave(Nave nave) {
+        naves.add(nave);
+    }
+
+    public boolean todasNavesHundidas() {
+        for (Nave nave : naves) {
+            if (!nave.estaHundida()) {
+                return false;
+            }
+        }
+        return !naves.isEmpty();
+    }
+
+    public int getFilas() {
+        return filas;
+    }
+
+    public void setFilas(int filas) {
+        this.filas = filas;
+    }
+
+    public int getColumnas() {
+        return columnas;
+    }
+
+    public void setColumnas(int columnas) {
+        this.columnas = columnas;
+    }
+
+    public boolean isConfirmado() {
+        return confirmado;
+    }
+
+    public void setConfirmado(boolean confirmado) {
+        this.confirmado = confirmado;
+    }
+
+    public Casilla[][] getCasillas() {
+        return casillas;
+    }
+
+    public void setCasillas(Casilla[][] casillas) {
+        this.casillas = casillas;
+    }
+
+    public List<Nave> getNaves() {
+        return naves;
+    }
+
+    public void setNaves(List<Nave> naves) {
+        this.naves = naves;
+    }
 }
