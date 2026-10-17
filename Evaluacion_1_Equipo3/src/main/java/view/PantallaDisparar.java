@@ -9,11 +9,13 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import model.Casilla;
+import model.Disparo;
 import model.IModel;
 import model.Jugador;
 import model.Tablero;
 import model.enums.EstadoCasilla;
 import model.enums.EstadoPartida;
+import model.enums.ResultadoDisparo;
 import observer.IObservador;
 
 /**
@@ -21,7 +23,7 @@ import observer.IObservador;
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
 public class PantallaDisparar extends JFrame implements IObservador{
-    // --- Control y Datos Locales ---
+   // --- Control y Datos Locales ---
     private final IControlJuego control;
     private final Jugador jugadorLocal;
     
@@ -37,7 +39,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
     private JLabel lblJugadorTurno;
 
     private JPanel[][] miniGridPropio = new JPanel[10][10];
-    private JButton[][] gridBotonesOp = new JButton[10][10];
+    private CasillaBoton[][] gridBotonesOp = new CasillaBoton[10][10];
 
     private JLabel lblPortaaviones;
     private JLabel lblCruceros;
@@ -52,7 +54,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
     private final Color COLOR_BARRA_INFERIOR = new Color(13, 44, 76);  // Azul marino oscuro
     private final Color COLOR_PANEL_DERECHO = new Color(74, 142, 214);  // Azul medio
     private final Color COLOR_BOTON_ROJO = new Color(225, 45, 45);     // Botón abandonar
-    private final Color COLOR_BOTON_VERDE = new Color(40, 167, 69);    // Pill indicador
+    private final Color COLOR_BOTON_VERDE = new Color(40, 167, 69);    // Verde de selección y acción
     private final Color COLOR_TEMPORIZADOR = new Color(220, 180, 0);   // Amarillo temporizador
     private final Color COLOR_GRIS_BOTON = new Color(128, 128, 128);   // Botón Disparar inactivo
 
@@ -115,7 +117,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
         pnlCentro.setLayout(new BoxLayout(pnlCentro, BoxLayout.Y_AXIS));
         pnlCentro.setOpaque(false);
 
-        // Marcador con ancho reducido (110px en lugar de 160px)
+        // Marcador con ancho compacto
         Dimension dimMarcador = new Dimension(110, 38);
         JPanel pnlMarcadorBox = new JPanel(new GridLayout(1, 2));
         pnlMarcadorBox.setPreferredSize(dimMarcador);
@@ -138,7 +140,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
         pnlMarcadorBox.add(lblMarcadorAzul);
         pnlMarcadorBox.add(lblMarcadorRojo);
 
-        // Temporizador MÁS GRANDE (fuente 20pt y caja 130x30px)
+        // Temporizador amplio
         lblTiempo = new JLabel("00:30", SwingConstants.CENTER);
         lblTiempo.setFont(new Font("Impact", Font.PLAIN, 20));
         lblTiempo.setForeground(Color.WHITE);
@@ -186,13 +188,8 @@ public class PantallaDisparar extends JFrame implements IObservador{
         cuerpoPanel.setOpaque(false);
         cuerpoPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // IZQUIERDA: Minimapa "Tu tablero"
         cuerpoPanel.add(crearPanelMinimapa(), BorderLayout.WEST);
-
-        // CENTRO: Tablero de Disparo (10x10)
         cuerpoPanel.add(crearPanelTableroPrincipal(), BorderLayout.CENTER);
-
-        // DERECHA: Estado de las Naves + Pill verde
         cuerpoPanel.add(crearPanelEstadoDerecho(), BorderLayout.EAST);
 
         return cuerpoPanel;
@@ -204,7 +201,6 @@ public class PantallaDisparar extends JFrame implements IObservador{
         pnlMinimapaContenedor.setOpaque(false);
         pnlMinimapaContenedor.setPreferredSize(new Dimension(180, 0));
 
-        // Dimensiones cuadradas estrictas para evitar estiramiento vertical (160x160 px)
         Dimension miniSize = new Dimension(160, 160);
         JPanel pnlGridMini = new JPanel(new GridLayout(10, 10, 1, 1));
         pnlGridMini.setPreferredSize(miniSize);
@@ -216,7 +212,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
         for (int f = 0; f < 10; f++) {
             for (int c = 0; c < 10; c++) {
                 JPanel cell = new JPanel();
-                cell.setBackground(new Color(130, 180, 230)); // Agua
+                cell.setBackground(new Color(130, 180, 230));
                 cell.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 120), 1));
                 miniGridPropio[f][c] = cell;
                 pnlGridMini.add(cell);
@@ -230,7 +226,6 @@ public class PantallaDisparar extends JFrame implements IObservador{
 
         pnlGridMini.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Usamos Glue para centrar verticalmente el minimapa y mantener la proporción
         pnlMinimapaContenedor.add(Box.createVerticalGlue());
         pnlMinimapaContenedor.add(pnlGridMini);
         pnlMinimapaContenedor.add(Box.createVerticalStrut(10));
@@ -244,10 +239,10 @@ public class PantallaDisparar extends JFrame implements IObservador{
         JPanel pnlPrincipalContenedor = new JPanel(new BorderLayout());
         pnlPrincipalContenedor.setOpaque(false);
 
-        // Encabezados de Columnas (A-J)
+        // Columnas (A-J)
         JPanel pnlColumnas = new JPanel(new GridLayout(1, 11));
         pnlColumnas.setOpaque(false);
-        pnlColumnas.add(new JLabel("")); // Esquina vacía
+        pnlColumnas.add(new JLabel("")); 
         String[] letras = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
         for (String l : letras) {
             JLabel lbl = new JLabel(l, SwingConstants.CENTER);
@@ -256,7 +251,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
             pnlColumnas.add(lbl);
         }
 
-        // Encabezados de Filas (1-10)
+        // Filas (1-10)
         JPanel pnlFilas = new JPanel(new GridLayout(10, 1));
         pnlFilas.setOpaque(false);
         pnlFilas.setPreferredSize(new Dimension(30, 0));
@@ -267,7 +262,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
             pnlFilas.add(lbl);
         }
 
-        // Grid de Botones 10x10
+        // Grid de Botones Personalizados 10x10
         JPanel pnlGridOp = new JPanel(new GridLayout(10, 10, 2, 2));
         pnlGridOp.setOpaque(false);
 
@@ -275,10 +270,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
             final int fila = f;
             for (int c = 0; c < 10; c++) {
                 final int col = c;
-                JButton btn = new JButton();
-                btn.setBackground(new Color(110, 165, 225));
-                btn.setBorder(new LineBorder(Color.WHITE, 1));
-                btn.setFocusPainted(false);
+                CasillaBoton btn = new CasillaBoton();
 
                 btn.addActionListener(e -> seleccionarCasilla(fila, col));
 
@@ -305,7 +297,6 @@ public class PantallaDisparar extends JFrame implements IObservador{
         pnlDerecho.setOpaque(false);
         pnlDerecho.setPreferredSize(new Dimension(230, 0));
 
-        // Cuadro de lista de barcos
         JPanel pnlListaBarcos = new JPanel();
         pnlListaBarcos.setLayout(new BoxLayout(pnlListaBarcos, BoxLayout.Y_AXIS));
         pnlListaBarcos.setBackground(COLOR_PANEL_DERECHO);
@@ -324,7 +315,6 @@ public class PantallaDisparar extends JFrame implements IObservador{
         pnlListaBarcos.add(Box.createVerticalStrut(15));
         pnlListaBarcos.add(lblBarcos);
 
-        // Botón indicador tipo Pill Verde
         lblInstruccionPill = new JLabel("<html><center>Selecciona una casilla<br>para disparar</center></html>", SwingConstants.CENTER);
         lblInstruccionPill.setFont(new Font("Arial", Font.BOLD, 12));
         lblInstruccionPill.setForeground(Color.WHITE);
@@ -385,15 +375,21 @@ public class PantallaDisparar extends JFrame implements IObservador{
     // LÓGICA DE INTERACCIÓN Y EVENTOS
     // ==========================================
     private void seleccionarCasilla(int f, int c) {
+        // Restaurar la selección anterior si no ha sido disparada
         if (filaSeleccionada != -1 && colSeleccionada != -1) {
-            gridBotonesOp[filaSeleccionada][colSeleccionada].setBorder(new LineBorder(Color.WHITE, 1));
+            CasillaBoton prevBtn = gridBotonesOp[filaSeleccionada][colSeleccionada];
+            if (prevBtn.getEstadoVisual() == CasillaBoton.EstadoVisual.SELECCIONADA) {
+                prevBtn.setEstadoVisual(CasillaBoton.EstadoVisual.NORMAL);
+            }
         }
 
         filaSeleccionada = f;
         colSeleccionada = c;
 
-        gridBotonesOp[f][c].setBorder(new LineBorder(Color.YELLOW, 3));
+        // Pintar la casilla seleccionada de verde completo
+        gridBotonesOp[f][c].setEstadoVisual(CasillaBoton.EstadoVisual.SELECCIONADA);
 
+        // Habilitar botón Disparar
         btnDisparar.setEnabled(true);
         btnDisparar.setBackground(COLOR_BOTON_VERDE);
     }
@@ -458,7 +454,23 @@ public class PantallaDisparar extends JFrame implements IObservador{
                 }
             }
 
-            // 4. Actualizar Estado de Fin de Partida
+            // 4. Actualizar Disparos Realizados en el Tablero Oponente
+            if (jugadorLocal != null && jugadorLocal.getDisparosRealizados() != null) {
+                for (Disparo disparo : jugadorLocal.getDisparosRealizados()) {
+                    int f = disparo.getFila();
+                    int c = disparo.getColumna();
+                    CasillaBoton btn = gridBotonesOp[f][c];
+
+                    if (disparo.obtenerResultadoDisparo() == ResultadoDisparo.AGUA) {
+                        btn.setEstadoVisual(CasillaBoton.EstadoVisual.AGUA);
+                    } else { // IMPACTO u HUNDIDA
+                        btn.setEstadoVisual(CasillaBoton.EstadoVisual.IMPACTO_FUEGO);
+                    }
+                    btn.setEnabled(false); // No se puede volver a hacer clic en casillas ya disparadas
+                }
+            }
+
+            // 5. Actualizar Estado de Fin de Partida
             if (model.getEstado() == EstadoPartida.FINALIZADA) {
                 boolean gano = model.getGanador() != null && model.getGanador().equals(jugadorLocal);
                 if (gano) {
@@ -468,5 +480,95 @@ public class PantallaDisparar extends JFrame implements IObservador{
                 }
             }
         });
+    }
+
+    // ==========================================
+    // COMPONENTE PERSONALIZADO: CASILLA DE TABLERO
+    // ==========================================
+    private static class CasillaBoton extends JButton {
+
+        public enum EstadoVisual {
+            NORMAL,
+            SELECCIONADA,
+            AGUA,
+            IMPACTO_FUEGO
+        }
+
+        private EstadoVisual estadoVisual = EstadoVisual.NORMAL;
+
+        public CasillaBoton() {
+            setFocusPainted(false);
+            setContentAreaFilled(false);
+            setBorderPainted(false);
+        }
+
+        public void setEstadoVisual(EstadoVisual estado) {
+            this.estadoVisual = estado;
+            repaint();
+        }
+
+        public EstadoVisual getEstadoVisual() {
+            return estadoVisual;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int w = getWidth();
+            int h = getHeight();
+
+            switch (estadoVisual) {
+                case NORMAL:
+                    g2.setColor(new Color(110, 165, 225)); // Azul agua
+                    g2.fillRect(0, 0, w, h);
+                    break;
+
+                case SELECCIONADA:
+                    g2.setColor(new Color(40, 167, 69)); // Verde completo
+                    g2.fillRect(0, 0, w, h);
+                    break;
+
+                case AGUA:
+                    // Fondo gris
+                    g2.setColor(new Color(180, 180, 180));
+                    g2.fillRect(0, 0, w, h);
+
+                    // Círculo negro centrado (impacto en agua)
+                    g2.setColor(Color.BLACK);
+                    int radioAgua = Math.min(w, h) / 3;
+                    g2.fillOval((w - radioAgua) / 2, (h - radioAgua) / 2, radioAgua, radioAgua);
+                    break;
+
+                case IMPACTO_FUEGO:
+                    // Fondo con gradiente de fuego/furia
+                    GradientPaint gp = new GradientPaint(0, 0, new Color(230, 40, 0), w, h, new Color(110, 15, 0));
+                    g2.setPaint(gp);
+                    g2.fillRect(0, 0, w, h);
+
+                    // Efecto de humo oscuro alrededor
+                    g2.setColor(new Color(40, 40, 40, 170));
+                    g2.fillOval(-w / 4, -h / 4, w / 2, h / 2);
+                    g2.fillOval(w / 2, -h / 4, w / 2, h / 2);
+                    g2.fillOval(-w / 4, h / 2, w / 2, h / 2);
+
+                    // Llama central (Naranja/Amarillo)
+                    g2.setColor(new Color(255, 170, 0));
+                    int sizeFuego = (int) (Math.min(w, h) * 0.6);
+                    g2.fillOval((w - sizeFuego) / 2, (h - sizeFuego) / 2, sizeFuego, sizeFuego);
+
+                    g2.setColor(new Color(255, 235, 50));
+                    int innerFuego = sizeFuego / 2;
+                    g2.fillOval((w - innerFuego) / 2, (h - innerFuego) / 2, innerFuego, innerFuego);
+                    break;
+            }
+
+            // Borde blanco delimitador de casilla
+            g2.setColor(Color.WHITE);
+            g2.drawRect(0, 0, w - 1, h - 1);
+
+            g2.dispose();
+        }
     }
 }

@@ -99,7 +99,8 @@ public class Partida implements IModel, IObservable {
     public void actualizarTurno() {
         if (jugadores.size() == 2) {
             Jugador rival = obtenerRival(jugadorTurno);
-            this.jugadorTurno = rival;
+//            this.jugadorTurno = rival;
+              this.jugadorTurno = jugadores.get(0);
             reiniciarTiempo();
         }
     }
