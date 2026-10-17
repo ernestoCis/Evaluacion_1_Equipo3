@@ -23,7 +23,7 @@ public class Main {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            
+
             Partida partida = new Partida();
 
             Jugador j1 = new Jugador("Jugador 1", "Azul");
@@ -32,27 +32,30 @@ public class Main {
             partida.agregarJugador(j1);
             partida.agregarJugador(j2);
 
-            // --- BARCOS DUMMY EN EL MINIMAPA DEL JUGADOR 1 ---
             Tablero tableroPropio = j1.getTableroPropio();
+            tableroPropio.colocarNave(new Nave(TipoNave.PORTAAVION, Orientacion.VERTICAL), 1, 1);
+            tableroPropio.colocarNave(new Nave(TipoNave.SUBMARINO, Orientacion.HORIZONTAL), 6, 4);
 
-            Nave portaaviones = new Nave(TipoNave.PORTAAVION, Orientacion.VERTICAL);
-            portaaviones.agregarCasilla(tableroPropio.obtenerCasilla(1, 1));
-            portaaviones.agregarCasilla(tableroPropio.obtenerCasilla(2, 1));
-            portaaviones.agregarCasilla(tableroPropio.obtenerCasilla(3, 1));
-            portaaviones.agregarCasilla(tableroPropio.obtenerCasilla(4, 1));
-            tableroPropio.agregarNave(portaaviones);
+            Tablero tableroRival = j2.getTableroPropio();
 
-            Nave submarino = new Nave(TipoNave.SUBMARINO, Orientacion.HORIZONTAL);
-            submarino.agregarCasilla(tableroPropio.obtenerCasilla(6, 4));
-            submarino.agregarCasilla(tableroPropio.obtenerCasilla(6, 5));
-            tableroPropio.agregarNave(submarino);
+            // Portaaviones (4 casillas) -> Horizontal en A1, B1, C1, D1
+            tableroRival.colocarNave(new Nave(TipoNave.PORTAAVION, Orientacion.HORIZONTAL), 0, 0);
 
+            // Crucero (3 casillas) -> Vertical en C4, C5, C6
+            tableroRival.colocarNave(new Nave(TipoNave.CRUCERO, Orientacion.VERTICAL), 3, 2);
+
+            // Submarino (2 casillas) -> Vertical en E8, E9
+            tableroRival.colocarNave(new Nave(TipoNave.SUBMARINO, Orientacion.VERTICAL), 7, 4);
+
+            // Barco (1 casilla) -> Horizontal en H3
+            tableroRival.colocarNave(new Nave(TipoNave.BARCO, Orientacion.HORIZONTAL), 2, 7);
+
+
+            // Crear Controlador y Pantalla
             IControlJuego controlador = new ControlJuego(partida);
-
             PantallaDisparar pantalla = new PantallaDisparar(controlador, j1);
 
             partida.addObserver(pantalla);
-
             pantalla.setVisible(true);
 
             partida.notifyObservers();

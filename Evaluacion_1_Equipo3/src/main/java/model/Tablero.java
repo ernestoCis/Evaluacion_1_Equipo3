@@ -7,13 +7,15 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 import model.enums.EstadoCasilla;
+import model.enums.Orientacion;
 import model.enums.ResultadoDisparo;
 
 /**
  *
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
-public class Tablero{
+public class Tablero {
+
     private int filas;
     private int columnas;
     private boolean confirmado;
@@ -37,6 +39,40 @@ public class Tablero{
         }
     }
 
+    public boolean colocarNave(Nave nave, int filaInicio, int colInicio) {
+        int tamano = nave.getTipo().getTamano();
+        List<Casilla> casillasAOcupar = new ArrayList<>();
+
+        for (int i = 0; i < tamano; i++) {
+            int f = (nave.getOrientacion() == Orientacion.VERTICAL) ? filaInicio + i : filaInicio;
+            int c = (nave.getOrientacion() == Orientacion.HORIZONTAL) ? colInicio + i : colInicio;
+
+            if (!validarRango(f, c)) {
+                System.out.println("[ERROR TABLERO] No se puede colocar " + nave.getTipo() + " en (" + f + "," + c + "): Fuera de rango.");
+                return false;
+            }
+
+            Casilla casilla = obtenerCasilla(f, c);
+
+            // Verificar si ya hay otra nave ocupando esa casilla
+            for (Nave n : naves) {
+                if (n.ocupaCasilla(casilla)) {
+                    System.out.println("[ERROR TABLERO] No se puede colocar " + nave.getTipo() + " en (" + f + "," + c + "): Casilla ocupada.");
+                    return false;
+                }
+            }
+            casillasAOcupar.add(casilla);
+        }
+
+        // Asignar casillas a la nave e insertarla en la lista del tablero
+        for (Casilla c : casillasAOcupar) {
+            nave.agregarCasilla(c);
+        }
+        nave.setColocada(true);
+        this.naves.add(nave);
+        return true;
+    }
+
     public Casilla obtenerCasilla(int fila, int columna) {
         if (validarRango(fila, columna)) {
             return casillas[fila][columna];
@@ -49,14 +85,16 @@ public class Tablero{
     }
 
     public boolean validarDisparo(int fila, int columna) {
-        if (!validarRango(fila, columna)) return false;
+        if (!validarRango(fila, columna)) {
+            return false;
+        }
         Casilla c = obtenerCasilla(fila, columna);
         return c.obtenerEstado() == EstadoCasilla.SIN_DISPARAR;
     }
 
     public ResultadoDisparo verificarImpacto(int fila, int columna) {
         Casilla casilla = obtenerCasilla(fila, columna);
-        
+
         for (Nave nave : naves) {
             if (nave.ocupaCasilla(casilla)) {
                 casilla.cambiarEstado(EstadoCasilla.IMPACTADA);
@@ -64,7 +102,7 @@ public class Tablero{
                 return hundida ? ResultadoDisparo.HUNDIDA : ResultadoDisparo.IMPACTO;
             }
         }
-        
+
         casilla.cambiarEstado(EstadoCasilla.AGUA);
         return ResultadoDisparo.AGUA;
     }
