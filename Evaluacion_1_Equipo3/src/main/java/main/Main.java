@@ -38,16 +38,16 @@ public class Main {
 
             Tablero tableroRival = j2.getTableroPropio();
 
-            // Portaaviones (4 casillas) -> Horizontal en A1, B1, C1, D1
+            // Portaaviones (4 casillas) A1, B1, C1, D1
             tableroRival.colocarNave(new Nave(TipoNave.PORTAAVION, Orientacion.HORIZONTAL), 0, 0);
 
-            // Crucero (3 casillas) -> Vertical en C4, C5, C6
+            // Crucero (3 casillas) C4, C5, C6
             tableroRival.colocarNave(new Nave(TipoNave.CRUCERO, Orientacion.VERTICAL), 3, 2);
 
-            // Submarino (2 casillas) -> Vertical en E8, E9
+            // Submarino (2 casillas) E8, E9
             tableroRival.colocarNave(new Nave(TipoNave.SUBMARINO, Orientacion.VERTICAL), 7, 4);
 
-            // Barco (1 casilla) -> Horizontal en H3
+            // Barco (1 casilla) H3
             tableroRival.colocarNave(new Nave(TipoNave.BARCO, Orientacion.HORIZONTAL), 2, 7);
 
 
