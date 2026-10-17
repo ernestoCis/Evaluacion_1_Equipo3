@@ -29,6 +29,8 @@ public class PantallaDisparar extends JFrame implements IObservador{
     
     private int filaSeleccionada = -1;
     private int colSeleccionada = -1;
+    private int cantidadDisparosProcesados = 0;
+    private boolean alertaFinMostrada = false;
 
     // --- Componentes Gráficos de la Interfaz ---
     private JButton btnAbandonar;
@@ -425,15 +427,16 @@ public class PantallaDisparar extends JFrame implements IObservador{
     @Override
     public void update(IModel model) {
         SwingUtilities.invokeLater(() -> {
-            // 1. Actualizar Temporizador
             int t = model.getTiempoRestante();
             lblTiempo.setText(String.format("00:%02d", t));
 
-            // 2. Actualizar Turno
+            if (jugadorLocal != null) {
+                lblMarcadorAzul.setText(String.valueOf(jugadorLocal.getPuntajePartida()));
+            }
+
             boolean esMiTurno = model.getJugadorTurno() != null && model.getJugadorTurno().equals(jugadorLocal);
             lblJugadorTurno.setText(esMiTurno ? "Tu turno" : "Turno del oponente");
 
-            // 3. Actualizar Minimapa Propio
             Tablero tableroPropio = model.getTablero(jugadorLocal);
             if (tableroPropio != null) {
                 for (int f = 0; f < 10; f++) {
@@ -453,25 +456,38 @@ public class PantallaDisparar extends JFrame implements IObservador{
                     }
                 }
             }
-
-            // 4. Actualizar Disparos Realizados en el Tablero Oponente
             if (jugadorLocal != null && jugadorLocal.getDisparosRealizados() != null) {
+
+                int totalDisparos = jugadorLocal.getDisparosRealizados().size();
+                if (totalDisparos > cantidadDisparosProcesados) {
+                    // Sacamos el último disparo
+                    Disparo ultimoDisparo = jugadorLocal.getDisparosRealizados().get(totalDisparos - 1);
+
+                    // IMPORTANTE: Actualizamos el contador ANTES del JOptionPane para evitar el spam
+                    cantidadDisparosProcesados = totalDisparos;
+
+                    // Si el resultado fue HUNDIDA, mostramos la alerta
+                    if (ultimoDisparo.obtenerResultadoDisparo() == ResultadoDisparo.HUNDIDA) {
+                        JOptionPane.showMessageDialog(this,
+                                "¡Nave enemiga completamente destruida! (+1 punto)",
+                                "Alerta Impacto Nave",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
                 for (Disparo disparo : jugadorLocal.getDisparosRealizados()) {
                     int f = disparo.getFila();
                     int c = disparo.getColumna();
                     CasillaBoton btn = gridBotonesOp[f][c];
-
                     if (disparo.obtenerResultadoDisparo() == ResultadoDisparo.AGUA) {
                         btn.setEstadoVisual(CasillaBoton.EstadoVisual.AGUA);
-                    } else { // IMPACTO u HUNDIDA
+                    } else {
                         btn.setEstadoVisual(CasillaBoton.EstadoVisual.IMPACTO_FUEGO);
                     }
-                    btn.setEnabled(false); // No se puede volver a hacer clic en casillas ya disparadas
+                    btn.setEnabled(false);
                 }
             }
-
-            // 5. Actualizar Estado de Fin de Partida
-            if (model.getEstado() == EstadoPartida.FINALIZADA) {
+            if (model.getEstado() == EstadoPartida.FINALIZADA && !alertaFinMostrada) {
+                alertaFinMostrada = true;
                 boolean gano = model.getGanador() != null && model.getGanador().equals(jugadorLocal);
                 if (gano) {
                     JOptionPane.showMessageDialog(this, "¡VICTORIA! Has destruido la flota enemiga.", "Fin de Partida", JOptionPane.INFORMATION_MESSAGE);

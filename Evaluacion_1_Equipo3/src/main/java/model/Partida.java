@@ -7,6 +7,8 @@ package model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;         // <-- Importación nueva
+import java.util.TimerTask;     // <-- Importación nueva
 import model.enums.EstadoPartida;
 import model.enums.MotivoFin;
 import model.enums.ResultadoDisparo;
@@ -29,14 +31,48 @@ public class Partida implements IModel, IObservable {
     private List<Jugador> jugadores;
     private List<IObservador> observadores = new ArrayList<>();
 
+    private Timer timer;
+
     public Partida() {
         this.estado = EstadoPartida.ESPERANDO_JUGADOR;
         this.jugadores = new ArrayList<>();
         this.observadores = new ArrayList<>();
-        this.tiempoRestante = 30; // 30 segundos por turno
+        this.tiempoRestante = 30;
     }
 
-    // --- Implementación de IObservable ---
+
+    public void iniciarTemporizador() {
+        if (timer != null) {
+            timer.cancel();
+        }
+
+        reiniciarTiempo();
+        timer = new Timer();
+
+        // Tarea que se repetirá cada 1 segundo el scheduleAtFixedRate
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                tiempoRestante--;
+
+                if (tiempoRestante <= 0) {
+                    actualizarTurno(); // Si llega a 0, cambia el turno
+                }
+
+                notifyObservers();
+            }
+        }, 1000, 1000);
+    }
+
+    public void calcularPuntaje(Jugador jugador, ResultadoDisparo resultado) {
+        // Solo aumenta 1 punto si el resultado es HUNDIDA
+        if (resultado == ResultadoDisparo.HUNDIDA) {
+            jugador.setPuntajePartida(jugador.getPuntajePartida() + 1);
+        }
+        // Ya no hacemos nada si es solo IMPACTO
+    }
+
+
     @Override
     public void addObserver(IObservador o) {
         observadores.add(o);
@@ -54,7 +90,6 @@ public class Partida implements IModel, IObservable {
         }
     }
 
-    // --- Validaciones y reglas ---
     public boolean validarTurno(Jugador j) {
         return this.jugadorTurno.equals(j);
     }
@@ -85,11 +120,13 @@ public class Partida implements IModel, IObservable {
         Disparo disparo = new Disparo(jugadorDisparador, fila, col, resultado);
         jugadorDisparador.realizarDisparo(disparo);
 
+        calcularPuntaje(jugadorDisparador, resultado);
+
         // Si falló (Agua), cambia el turno; si impactó, conserva turno extra
         if (resultado == ResultadoDisparo.AGUA) {
             actualizarTurno();
         } else {
-            reiniciarTiempo();
+            iniciarTemporizador(); // <-- Iniciamos el timer de nuevo si acierta
         }
 
         verificarFinPartida();
@@ -100,8 +137,9 @@ public class Partida implements IModel, IObservable {
         if (jugadores.size() == 2) {
             Jugador rival = obtenerRival(jugadorTurno);
 //            this.jugadorTurno = rival;
-              this.jugadorTurno = jugadores.get(0);
-            reiniciarTiempo();
+            this.jugadorTurno = jugadores.get(0); // Respetando tu lógica de 1 jugador
+
+            iniciarTemporizador(); // <-- Arranca el tiempo del nuevo turno
         }
     }
 
@@ -114,6 +152,8 @@ public class Partida implements IModel, IObservable {
         for (Jugador j : jugadores) {
             Jugador rival = obtenerRival(j);
             if (rival.getTableroPropio().todasNavesHundidas()) {
+                if (timer != null) timer.cancel(); // Detenemos el tiempo si alguien ganó
+
                 this.ganador = j;
                 this.estado = EstadoPartida.FINALIZADA;
                 this.motivoFin = MotivoFin.FLOTA_HUNDIDA;
@@ -144,6 +184,8 @@ public class Partida implements IModel, IObservable {
         if (this.estado == EstadoPartida.FINALIZADA) {
             return;
         }
+
+        if (timer != null) timer.cancel(); // Detenemos el tiempo si alguien se rinde
 
         Jugador rival = obtenerRival(jugadorQueSeRinde);
         if (rival != null) {

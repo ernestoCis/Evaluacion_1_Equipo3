@@ -40,7 +40,7 @@ public class ControlJuego implements IControlJuego {
 
     @Override
     public void iniciarPartida() {
-        partida.reiniciarTiempo();
+        partida.iniciarTemporizador();
         partida.notifyObservers();
     }
 
