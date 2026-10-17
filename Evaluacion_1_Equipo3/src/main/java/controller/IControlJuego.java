@@ -4,10 +4,14 @@
  */
 package controller;
 
+import model.Jugador;
+
 /**
  *
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
 public interface IControlJuego {
-    
+    void disparar(Jugador jugador, int fila, int col);
+    void iniciarPartida();
+    void rendirse(Jugador jugador);
 }

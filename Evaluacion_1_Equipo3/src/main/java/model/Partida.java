@@ -17,14 +17,15 @@ import observer.IObservador;
  *
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
-public class Partida implements IModel, IObservable{
+public class Partida implements IModel, IObservable {
+
     private EstadoPartida estado;
     private Jugador jugadorTurno;
     private Jugador ganador;
     private MotivoFin motivoFin;
     private int tiempoRestante;
     private LocalDateTime inicioTurno;
-    
+
     private List<Jugador> jugadores;
     private List<IObservador> observadores = new ArrayList<>();
 
@@ -34,7 +35,7 @@ public class Partida implements IModel, IObservable{
         this.observadores = new ArrayList<>();
         this.tiempoRestante = 30; // 30 segundos por turno
     }
-    
+
     // --- Implementación de IObservable ---
     @Override
     public void addObserver(IObservador o) {
@@ -52,7 +53,7 @@ public class Partida implements IModel, IObservable{
             obs.update(this);
         }
     }
-    
+
     // --- Validaciones y reglas ---
     public boolean validarTurno(Jugador j) {
         return this.jugadorTurno.equals(j);
@@ -61,7 +62,7 @@ public class Partida implements IModel, IObservable{
     public boolean validarTiempo() {
         return this.tiempoRestante > 0;
     }
-    
+
     public void procesarDisparo(Jugador jugadorDisparador, int fila, int col) {
         if (!validarTurno(jugadorDisparador)) {
             return;
@@ -94,7 +95,7 @@ public class Partida implements IModel, IObservable{
         verificarFinPartida();
         notifyObservers();
     }
-    
+
     public void actualizarTurno() {
         if (jugadores.size() == 2) {
             Jugador rival = obtenerRival(jugadorTurno);
@@ -102,12 +103,12 @@ public class Partida implements IModel, IObservable{
             reiniciarTiempo();
         }
     }
-    
+
     public void reiniciarTiempo() {
         this.tiempoRestante = 30;
         this.inicioTurno = LocalDateTime.now();
     }
-    
+
     public void verificarFinPartida() {
         for (Jugador j : jugadores) {
             Jugador rival = obtenerRival(j);
@@ -119,7 +120,7 @@ public class Partida implements IModel, IObservable{
             }
         }
     }
-    
+
     public Jugador obtenerRival(Jugador jugador) {
         for (Jugador j : jugadores) {
             if (!j.equals(jugador)) {
@@ -128,7 +129,7 @@ public class Partida implements IModel, IObservable{
         }
         return null;
     }
-    
+
     public void agregarJugador(Jugador j) {
         if (jugadores.size() < 2) {
             jugadores.add(j);
@@ -137,7 +138,23 @@ public class Partida implements IModel, IObservable{
             }
         }
     }
-    
+
+    public void procesarRendicion(Jugador jugadorQueSeRinde) {
+        if (this.estado == EstadoPartida.FINALIZADA) {
+            return;
+        }
+
+        Jugador rival = obtenerRival(jugadorQueSeRinde);
+        if (rival != null) {
+            this.ganador = rival;
+        }
+
+        this.estado = EstadoPartida.FINALIZADA;
+        this.motivoFin = MotivoFin.ABANDONO;
+
+        notifyObservers();
+    }
+
     // --- Getters y Setters
     public EstadoPartida getEstado() {
         return estado;
