@@ -9,5 +9,6 @@
         <module name="Evaluacion_1_Equipo3" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="24" />
   </component>
 </project>

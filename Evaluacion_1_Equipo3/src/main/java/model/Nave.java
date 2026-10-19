@@ -6,6 +6,8 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import model.enums.EstadoNave;
 import model.enums.Orientacion;
 import model.enums.TipoNave;
 
@@ -35,6 +37,13 @@ public class Nave{
 
     public boolean estaHundida() {
         return impactos >= tipo.getTamano();
+    }
+
+    public EstadoNave getEstado() {
+        if (estaHundida()) {
+            return EstadoNave.HUNDIDA;
+        }
+        return impactos > 0 ? EstadoNave.DAÑADA : EstadoNave.SIN_DAÑOS;
     }
 
     public void agregarCasilla(Casilla casilla) {

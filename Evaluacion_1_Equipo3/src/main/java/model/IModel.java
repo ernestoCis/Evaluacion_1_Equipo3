@@ -12,6 +12,7 @@ import model.enums.MotivoFin;
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
 public interface IModel {
+    ResumenFlota getResumenFlotaRival(Jugador observador);
     EstadoPartida getEstado();
     Jugador getJugadorTurno();
     Tablero getTablero(Jugador jugador);

@@ -5,10 +5,11 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
-import model.enums.EstadoCasilla;
-import model.enums.Orientacion;
-import model.enums.ResultadoDisparo;
+import java.util.Map;
+
+import model.enums.*;
 
 /**
  *
@@ -29,6 +30,23 @@ public class Tablero {
         this.casillas = new Casilla[filas][columnas];
         this.naves = new ArrayList<>();
         inicializarCasillas();
+    }
+
+    public ResumenFlota resumirFlota() {
+        Map<TipoNave, ConteoNaves> datos = new EnumMap<>(TipoNave.class);
+        for (TipoNave tipo : TipoNave.values()) {
+            datos.put(tipo, new ConteoNaves(
+                    contar(tipo, EstadoNave.SIN_DAÑOS),
+                    contar(tipo, EstadoNave.DAÑADA),
+                    contar(tipo, EstadoNave.HUNDIDA)));
+        }
+        return new ResumenFlota(datos);
+    }
+
+    private int contar(TipoNave tipo, EstadoNave estado) {
+        return (int) naves.stream()
+                .filter(n -> n.getTipo() == tipo && n.getEstado() == estado)
+                .count();
     }
 
     private void inicializarCasillas() {

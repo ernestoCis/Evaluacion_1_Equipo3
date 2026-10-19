@@ -259,4 +259,14 @@ public class Partida implements IModel, IObservable {
     public Tablero getTablero(Jugador jugador) {
         return jugador.getTableroPropio();
     }
+
+    @Override
+    public ResumenFlota getResumenFlotaRival(Jugador observador) {
+        for (Jugador j : jugadores) {
+            if (!j.equals(observador)) {
+                return j.getTableroPropio().resumirFlota();
+            }
+        }
+        return ResumenFlota.vacio();
+    }
 }

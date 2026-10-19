@@ -8,14 +8,12 @@ import controller.IControlJuego;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import model.Casilla;
-import model.Disparo;
-import model.IModel;
-import model.Jugador;
-import model.Tablero;
+
+import model.*;
 import model.enums.EstadoCasilla;
 import model.enums.EstadoPartida;
 import model.enums.ResultadoDisparo;
+import model.enums.TipoNave;
 import observer.IObservador;
 
 /**
@@ -304,10 +302,11 @@ public class PantallaDisparar extends JFrame implements IObservador{
         pnlListaBarcos.setBackground(COLOR_PANEL_DERECHO);
         pnlListaBarcos.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        lblPortaaviones = crearLabelNave("-Porta aviones:\n 2 sin daños");
-        lblCruceros = crearLabelNave("-Cruceros:\n 2 sin daños");
-        lblSubmarinos = crearLabelNave("-Submarinos:\n 4 sin daños");
-        lblBarcos = crearLabelNave("-Barcos:\n 3 sin daños");
+        lblPortaaviones = crearLabelNave("-Porta aviones:");
+        lblCruceros     = crearLabelNave("-Cruceros:");
+        lblSubmarinos   = crearLabelNave("-Submarinos:");
+        lblBarcos       = crearLabelNave("-Barcos:");
+
 
         pnlListaBarcos.add(lblPortaaviones);
         pnlListaBarcos.add(Box.createVerticalStrut(15));
@@ -436,6 +435,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
 
             boolean esMiTurno = model.getJugadorTurno() != null && model.getJugadorTurno().equals(jugadorLocal);
             lblJugadorTurno.setText(esMiTurno ? "Tu turno" : "Turno del oponente");
+            actualizarPanelNaves(model.getResumenFlotaRival(jugadorLocal));
 
             Tablero tableroPropio = model.getTablero(jugadorLocal);
             if (tableroPropio != null) {
@@ -586,5 +586,19 @@ public class PantallaDisparar extends JFrame implements IObservador{
 
             g2.dispose();
         }
+    }
+
+    private void actualizarPanelNaves(ResumenFlota resumen) {
+        lblPortaaviones.setText(formatear("Porta aviones", resumen.get(TipoNave.PORTAAVION)));
+        lblCruceros.setText(formatear("Cruceros", resumen.get(TipoNave.CRUCERO)));
+        lblSubmarinos.setText(formatear("Submarinos", resumen.get(TipoNave.SUBMARINO)));
+        lblBarcos.setText(formatear("Barcos", resumen.get(TipoNave.BARCO)));
+    }
+
+    private String formatear(String nombre, ConteoNaves c) {
+        return "<html>-" + nombre + ":<br>"
+                + "&nbsp;&nbsp;" + c.getSinDanos() + " sin daños<br>"
+                + "&nbsp;&nbsp;" + c.getDanadas()  + " dañados<br>"
+                + "&nbsp;&nbsp;" + c.getHundidas() + " hundidos</html>";
     }
 }
