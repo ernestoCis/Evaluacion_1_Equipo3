@@ -117,7 +117,14 @@ public class Tablero {
             if (nave.ocupaCasilla(casilla)) {
                 casilla.cambiarEstado(EstadoCasilla.IMPACTADA);
                 boolean hundida = nave.recibirDisparo();
-                return hundida ? ResultadoDisparo.HUNDIDA : ResultadoDisparo.IMPACTO;
+                if (hundida) {
+                    // La nave completa fue derribada: todas sus casillas pasan a HUNDIDA
+                    for (Casilla c : nave.getCasillasOcupadas()) {
+                        c.cambiarEstado(EstadoCasilla.HUNDIDA);
+                    }
+                    return ResultadoDisparo.HUNDIDA;
+                }
+                return ResultadoDisparo.IMPACTO;
             }
         }
 

@@ -20,15 +20,17 @@ import observer.IObservador;
  *
  * @author Jesus Cisneros, Paulina Guevara, Sebastian Villegas, Benjamin Barcelo
  */
-public class PantallaDisparar extends JFrame implements IObservador{
-   // --- Control y Datos Locales ---
+public class PantallaDisparar extends JFrame implements IObservador {
+    // --- Control y Datos Locales ---
+
     private final IControlJuego control;
     private final Jugador jugadorLocal;
-    
+
     private int filaSeleccionada = -1;
     private int colSeleccionada = -1;
     private int cantidadDisparosProcesados = 0;
     private boolean alertaFinMostrada = false;
+    private boolean avisoAbierto = false;
 
     // --- Componentes Gráficos de la Interfaz ---
     private JButton btnAbandonar;
@@ -146,7 +148,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
         lblTiempo.setForeground(Color.WHITE);
         lblTiempo.setOpaque(true);
         lblTiempo.setBackground(COLOR_TEMPORIZADOR);
-        
+
         Dimension dimTiempo = new Dimension(130, 30);
         lblTiempo.setPreferredSize(dimTiempo);
         lblTiempo.setMaximumSize(dimTiempo);
@@ -242,7 +244,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
         // Columnas (A-J)
         JPanel pnlColumnas = new JPanel(new GridLayout(1, 11));
         pnlColumnas.setOpaque(false);
-        pnlColumnas.add(new JLabel("")); 
+        pnlColumnas.add(new JLabel(""));
         String[] letras = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
         for (String l : letras) {
             JLabel lbl = new JLabel(l, SwingConstants.CENTER);
@@ -303,10 +305,9 @@ public class PantallaDisparar extends JFrame implements IObservador{
         pnlListaBarcos.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         lblPortaaviones = crearLabelNave("-Porta aviones:");
-        lblCruceros     = crearLabelNave("-Cruceros:");
-        lblSubmarinos   = crearLabelNave("-Submarinos:");
-        lblBarcos       = crearLabelNave("-Barcos:");
-
+        lblCruceros = crearLabelNave("-Cruceros:");
+        lblSubmarinos = crearLabelNave("-Submarinos:");
+        lblBarcos = crearLabelNave("-Barcos:");
 
         pnlListaBarcos.add(lblPortaaviones);
         pnlListaBarcos.add(Box.createVerticalStrut(15));
@@ -397,6 +398,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
 
     private void accionEjecutarDisparo() {
         if (filaSeleccionada != -1 && colSeleccionada != -1) {
+
             control.disparar(jugadorLocal, filaSeleccionada, colSeleccionada);
 
             btnDisparar.setEnabled(false);
@@ -425,8 +427,12 @@ public class PantallaDisparar extends JFrame implements IObservador{
     // ==========================================
     @Override
     public void update(IModel model) {
+        final String mensaje = model.getMensaje();
+
         SwingUtilities.invokeLater(() -> {
+
             int t = model.getTiempoRestante();
+
             lblTiempo.setText(String.format("00:%02d", t));
 
             if (jugadorLocal != null) {
@@ -443,10 +449,11 @@ public class PantallaDisparar extends JFrame implements IObservador{
                     for (int c = 0; c < 10; c++) {
                         Casilla casilla = tableroPropio.obtenerCasilla(f, c);
                         if (casilla != null) {
-                            if (casilla.obtenerEstado() == EstadoCasilla.IMPACTADA) {
+                            if (casilla.obtenerEstado() == EstadoCasilla.HUNDIDA) {
+                                miniGridPropio[f][c].setBackground(new Color(90, 0, 0)); // Nave hundida
+                            } else if (casilla.obtenerEstado() == EstadoCasilla.IMPACTADA) {
                                 miniGridPropio[f][c].setBackground(Color.RED);
                             } else if (casilla.obtenerEstado() == EstadoCasilla.AGUA) {
-                                miniGridPropio[f][c].setBackground(Color.CYAN);
                             } else {
                                 boolean tieneNave = tableroPropio.getNaves().stream()
                                         .anyMatch(n -> n.ocupaCasilla(casilla));
@@ -474,12 +481,21 @@ public class PantallaDisparar extends JFrame implements IObservador{
                                 JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
+                Jugador rival = model.obtenerRival(jugadorLocal);
+                Tablero tableroRival = (rival != null) ? model.getTablero(rival) : null;
+
                 for (Disparo disparo : jugadorLocal.getDisparosRealizados()) {
                     int f = disparo.getFila();
                     int c = disparo.getColumna();
                     CasillaBoton btn = gridBotonesOp[f][c];
+
+                    boolean naveHundida = tableroRival != null
+                            && tableroRival.obtenerCasilla(f, c).obtenerEstado() == EstadoCasilla.HUNDIDA;
+
                     if (disparo.obtenerResultadoDisparo() == ResultadoDisparo.AGUA) {
                         btn.setEstadoVisual(CasillaBoton.EstadoVisual.AGUA);
+                    } else if (naveHundida) {
+                        btn.setEstadoVisual(CasillaBoton.EstadoVisual.HUNDIDA);
                     } else {
                         btn.setEstadoVisual(CasillaBoton.EstadoVisual.IMPACTO_FUEGO);
                     }
@@ -495,19 +511,29 @@ public class PantallaDisparar extends JFrame implements IObservador{
                     JOptionPane.showMessageDialog(this, "DERROTA. Tu flota ha sido destruida.", "Fin de Partida", JOptionPane.ERROR_MESSAGE);
                 }
             }
+
+            // Aviso de turno perdido (agua o tiempo agotado). Va al final para que
+            // el tablero ya esté repintado cuando aparezca la ventana.
+            if (mensaje != null && !avisoAbierto) {
+                avisoAbierto = true; // Evita que se encimen varias ventanas
+                JOptionPane.showMessageDialog(this, mensaje, "Aviso de turno", JOptionPane.WARNING_MESSAGE);
+                avisoAbierto = false;
+            }
+
         });
     }
-
     // ==========================================
     // COMPONENTE PERSONALIZADO: CASILLA DE TABLERO
     // ==========================================
+
     private static class CasillaBoton extends JButton {
 
         public enum EstadoVisual {
             NORMAL,
             SELECCIONADA,
             AGUA,
-            IMPACTO_FUEGO
+            IMPACTO_FUEGO,
+            HUNDIDA
         }
 
         private EstadoVisual estadoVisual = EstadoVisual.NORMAL;
@@ -578,6 +604,28 @@ public class PantallaDisparar extends JFrame implements IObservador{
                     int innerFuego = sizeFuego / 2;
                     g2.fillOval((w - innerFuego) / 2, (h - innerFuego) / 2, innerFuego, innerFuego);
                     break;
+
+                case HUNDIDA:
+                    // Mismo dibujo que IMPACTO_FUEGO, pero apagado y en tonos ceniza
+                    GradientPaint gpHundida = new GradientPaint(0, 0, new Color(120, 112, 108), w, h, new Color(48, 44, 44));
+                    g2.setPaint(gpHundida);
+                    g2.fillRect(0, 0, w, h);
+
+                    // Humo más oscuro alrededor
+                    g2.setColor(new Color(25, 25, 25, 170));
+                    g2.fillOval(-w / 4, -h / 4, w / 2, h / 2);
+                    g2.fillOval(w / 2, -h / 4, w / 2, h / 2);
+                    g2.fillOval(-w / 4, h / 2, w / 2, h / 2);
+
+                    // Brasa apagada (gris ceniza)
+                    g2.setColor(new Color(150, 140, 135));
+                    int sizeCeniza = (int) (Math.min(w, h) * 0.6);
+                    g2.fillOval((w - sizeCeniza) / 2, (h - sizeCeniza) / 2, sizeCeniza, sizeCeniza);
+
+                    g2.setColor(new Color(195, 188, 182));
+                    int innerCeniza = sizeCeniza / 2;
+                    g2.fillOval((w - innerCeniza) / 2, (h - innerCeniza) / 2, innerCeniza, innerCeniza);
+                    break;
             }
 
             // Borde blanco delimitador de casilla
@@ -598,7 +646,7 @@ public class PantallaDisparar extends JFrame implements IObservador{
     private String formatear(String nombre, ConteoNaves c) {
         return "<html>-" + nombre + ":<br>"
                 + "&nbsp;&nbsp;" + c.getSinDanos() + " sin daños<br>"
-                + "&nbsp;&nbsp;" + c.getDanadas()  + " dañados<br>"
+                + "&nbsp;&nbsp;" + c.getDanadas() + " dañados<br>"
                 + "&nbsp;&nbsp;" + c.getHundidas() + " hundidos</html>";
     }
 }

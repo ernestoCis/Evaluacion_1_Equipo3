@@ -86,11 +86,11 @@ public class Nave{
         this.colocada = colocada;
     }
 
-    public List getCasillasOcupadas() {
+      public List<Casilla> getCasillasOcupadas() {
         return casillasOcupadas;
     }
 
-    public void setCasillasOcupadas(List casillasOcupadas) {
+    public void setCasillasOcupadas(List<Casilla> casillasOcupadas) {
         this.casillasOcupadas = casillasOcupadas;
     }
 }

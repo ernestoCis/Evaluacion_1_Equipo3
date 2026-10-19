@@ -11,5 +11,6 @@ package model.enums;
 public enum EstadoCasilla {
     SIN_DISPARAR,
     IMPACTADA,
-    AGUA
+    AGUA, 
+    HUNDIDA
 }

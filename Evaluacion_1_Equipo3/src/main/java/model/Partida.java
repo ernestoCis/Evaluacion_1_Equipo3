@@ -27,6 +27,8 @@ public class Partida implements IModel, IObservable {
     private MotivoFin motivoFin;
     private int tiempoRestante;
     private LocalDateTime inicioTurno;
+        private String mensaje; // Aviso para el jugador (tiempo agotado, disparo al agua)
+
 
     private List<Jugador> jugadores;
     private List<IObservador> observadores = new ArrayList<>();
@@ -57,9 +59,10 @@ public class Partida implements IModel, IObservable {
 
                 if (tiempoRestante <= 0) {
                     actualizarTurno(); // Si llega a 0, cambia el turno
+                    notificar("¡Tiempo agotado! Se pierde el turno.");
+                } else {
+                    notifyObservers();
                 }
-
-                notifyObservers();
             }
         }, 1000, 1000);
     }
@@ -81,6 +84,17 @@ public class Partida implements IModel, IObservable {
     @Override
     public void removeObserver(IObservador o) {
         observadores.remove(o);
+    }
+    
+     private void notificar(String mensaje) {
+        this.mensaje = mensaje;
+        notifyObservers();
+        this.mensaje = null;
+    }
+
+    @Override
+    public String getMensaje() {
+        return mensaje;
     }
 
     @Override
@@ -130,7 +144,11 @@ public class Partida implements IModel, IObservable {
         }
 
         verificarFinPartida();
-        notifyObservers();
+        if (resultado == ResultadoDisparo.AGUA) {
+            notificar("¡Agua! Se pierde el turno.");
+        } else {
+            notifyObservers();
+        }
     }
 
     public void actualizarTurno() {
@@ -162,6 +180,7 @@ public class Partida implements IModel, IObservable {
         }
     }
 
+    @Override
     public Jugador obtenerRival(Jugador jugador) {
         for (Jugador j : jugadores) {
             if (!j.equals(jugador)) {
