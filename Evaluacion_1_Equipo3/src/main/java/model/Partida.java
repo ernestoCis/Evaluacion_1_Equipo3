@@ -27,8 +27,7 @@ public class Partida implements IModel, IObservable {
     private MotivoFin motivoFin;
     private int tiempoRestante;
     private LocalDateTime inicioTurno;
-        private String mensaje; // Aviso para el jugador (tiempo agotado, disparo al agua)
-
+    private String mensaje; // Aviso para el jugador (tiempo agotado, disparo al agua)
 
     private List<Jugador> jugadores;
     private List<IObservador> observadores = new ArrayList<>();
@@ -41,7 +40,6 @@ public class Partida implements IModel, IObservable {
         this.observadores = new ArrayList<>();
         this.tiempoRestante = 30;
     }
-
 
     public void iniciarTemporizador() {
         if (timer != null) {
@@ -75,7 +73,6 @@ public class Partida implements IModel, IObservable {
         // Ya no hacemos nada si es solo IMPACTO
     }
 
-
     @Override
     public void addObserver(IObservador o) {
         observadores.add(o);
@@ -85,8 +82,8 @@ public class Partida implements IModel, IObservable {
     public void removeObserver(IObservador o) {
         observadores.remove(o);
     }
-    
-     private void notificar(String mensaje) {
+
+    private void notificar(String mensaje) {
         this.mensaje = mensaje;
         notifyObservers();
         this.mensaje = null;
@@ -113,6 +110,11 @@ public class Partida implements IModel, IObservable {
     }
 
     public void procesarDisparo(Jugador jugadorDisparador, int fila, int col) {
+        // Si la partida ya terminó, no se aceptan más disparos
+        if (estado == EstadoPartida.FINALIZADA) {
+            return;
+        }
+        
         if (!validarTurno(jugadorDisparador)) {
             return;
         }
@@ -170,8 +172,9 @@ public class Partida implements IModel, IObservable {
         for (Jugador j : jugadores) {
             Jugador rival = obtenerRival(j);
             if (rival.getTableroPropio().todasNavesHundidas()) {
-                if (timer != null) timer.cancel(); // Detenemos el tiempo si alguien ganó
-
+                if (timer != null) {
+                    timer.cancel(); // Detenemos el tiempo si alguien ganó
+                }
                 this.ganador = j;
                 this.estado = EstadoPartida.FINALIZADA;
                 this.motivoFin = MotivoFin.FLOTA_HUNDIDA;
@@ -204,8 +207,9 @@ public class Partida implements IModel, IObservable {
             return;
         }
 
-        if (timer != null) timer.cancel(); // Detenemos el tiempo si alguien se rinde
-
+        if (timer != null) {
+            timer.cancel(); // Detenemos el tiempo si alguien se rinde
+        }
         Jugador rival = obtenerRival(jugadorQueSeRinde);
         if (rival != null) {
             this.ganador = rival;

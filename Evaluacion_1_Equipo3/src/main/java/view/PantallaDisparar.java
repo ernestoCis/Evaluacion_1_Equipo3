@@ -474,7 +474,7 @@ public class PantallaDisparar extends JFrame implements IObservador {
                     cantidadDisparosProcesados = totalDisparos;
 
                     // Si el resultado fue HUNDIDA, mostramos la alerta
-                    if (ultimoDisparo.obtenerResultadoDisparo() == ResultadoDisparo.HUNDIDA) {
+                    if (ultimoDisparo.obtenerResultadoDisparo() == ResultadoDisparo.HUNDIDA && model.getEstado() != EstadoPartida.FINALIZADA) {
                         JOptionPane.showMessageDialog(this,
                                 "¡Nave enemiga completamente destruida! (+1 punto)",
                                 "Alerta Impacto Nave",
@@ -504,9 +504,22 @@ public class PantallaDisparar extends JFrame implements IObservador {
             }
             if (model.getEstado() == EstadoPartida.FINALIZADA && !alertaFinMostrada) {
                 alertaFinMostrada = true;
+
+                // Bloquear el tablero y el botón: la partida terminó
+                for (int f = 0; f < 10; f++) {
+                    for (int c = 0; c < 10; c++) {
+                        gridBotonesOp[f][c].setEnabled(false);
+                    }
+                }
+                btnDisparar.setEnabled(false);
+                btnDisparar.setBackground(COLOR_GRIS_BOTON);
+                lblJugadorTurno.setText("Partida finalizada");
+
                 boolean gano = model.getGanador() != null && model.getGanador().equals(jugadorLocal);
                 if (gano) {
-                    JOptionPane.showMessageDialog(this, "¡VICTORIA! Has destruido la flota enemiga.", "Fin de Partida", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                            "¡VICTORIA!\nHundiste la última nave: la flota enemiga fue destruida por completo.",
+                            "Fin de Partida", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(this, "DERROTA. Tu flota ha sido destruida.", "Fin de Partida", JOptionPane.ERROR_MESSAGE);
                 }
