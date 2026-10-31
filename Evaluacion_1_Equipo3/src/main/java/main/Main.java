@@ -3,16 +3,19 @@
  */
 package main;
 
-import controller.ControlJuego;
-import controller.IControlJuego;
+import application.usecases.IniciarPartidaUseCase;
+import application.usecases.RealizarDisparoUseCase;
+import application.usecases.RendirseUseCase;
+import domain.model.aggregate.Partida;
+import domain.model.entity.Jugador;
+import domain.model.entity.Nave;
+import domain.model.entity.Tablero;
+import domain.model.enums.Orientacion;
+import domain.model.enums.TipoNave;
+import ui.AlertasView;
+import ui.PantallaDisparar;
+
 import javax.swing.SwingUtilities;
-import model.Jugador;
-import model.Nave;
-import model.Partida;
-import model.Tablero;
-import model.enums.Orientacion;
-import model.enums.TipoNave;
-import view.PantallaDisparar;
 
 /**
  *
@@ -23,8 +26,10 @@ public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
 
+            // 1. Instancia del Aggregate Root (Partida)
             Partida partida = new Partida();
 
+            // 2. Creación e inscripción de Jugadores
             Jugador j1 = new Jugador("Jugador 1", "Azul");
             Jugador j2 = new Jugador("Jugador 2", "Rojo");
 
@@ -59,14 +64,18 @@ public class Main {
             tableroRival.colocarNave(new Nave(TipoNave.BARCO, Orientacion.HORIZONTAL), 9, 5);       // F10
             tableroRival.colocarNave(new Nave(TipoNave.BARCO, Orientacion.HORIZONTAL), 9, 9);       // J10
 
-            // Crear Controlador y Pantalla
-            IControlJuego controlador = new ControlJuego(partida);
-            PantallaDisparar pantalla = new PantallaDisparar(controlador, j1);
+            // 3. Casos de Uso (Capa de Aplicación DDD)
+            RealizarDisparoUseCase disparoUC = new RealizarDisparoUseCase(partida);
+            RendirseUseCase rendirseUC = new RendirseUseCase(partida);
+            IniciarPartidaUseCase iniciarPartidaUC = new IniciarPartidaUseCase(partida);
 
-            partida.addObserver(pantalla);
+            // 4. Instancia de Vista y Alertas
+            PantallaDisparar pantalla = new PantallaDisparar(disparoUC, rendirseUC, j1, partida);
+            new AlertasView(pantalla, j1);
+
+            // 5. Mostrar ventana e iniciar temporizador
             pantalla.setVisible(true);
-
-            controlador.iniciarPartida(); 
+            iniciarPartidaUC.ejecutar();
         });
     }
 }
