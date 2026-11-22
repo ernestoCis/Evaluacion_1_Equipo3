@@ -1,6 +1,7 @@
-C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\NetBeansProjects\BatallaNaval\comApplication\src\main\java\application\ControlJuego.java
-C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\NetBeansProjects\BatallaNaval\comApplication\src\main\java\application\IControlJuego.java
-C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\NetBeansProjects\BatallaNaval\comApplication\src\main\java\application\mapper\DomainMapper.java
-C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\NetBeansProjects\BatallaNaval\comApplication\src\main\java\application\usecases\IniciarPartidaUseCase.java
-C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\NetBeansProjects\BatallaNaval\comApplication\src\main\java\application\usecases\RealizarDisparoUseCase.java
-C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\NetBeansProjects\BatallaNaval\comApplication\src\main\java\application\usecases\RendirseUseCase.java
+C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\GitHub\Evaluacion_1_Equipo3\BatallaNaval\comApplication\src\main\java\application\ControlJuegoCliente.java
+C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\GitHub\Evaluacion_1_Equipo3\BatallaNaval\comApplication\src\main\java\application\ControlJuegoServidor.java
+C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\GitHub\Evaluacion_1_Equipo3\BatallaNaval\comApplication\src\main\java\application\IControlJuego.java
+C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\GitHub\Evaluacion_1_Equipo3\BatallaNaval\comApplication\src\main\java\application\mapper\DomainMapper.java
+C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\GitHub\Evaluacion_1_Equipo3\BatallaNaval\comApplication\src\main\java\application\usecases\IniciarPartidaUseCase.java
+C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\GitHub\Evaluacion_1_Equipo3\BatallaNaval\comApplication\src\main\java\application\usecases\RealizarDisparoUseCase.java
+C:\Users\jesus\OneDrive\Todo\Personal\Todo\Documentos\GitHub\Evaluacion_1_Equipo3\BatallaNaval\comApplication\src\main\java\application\usecases\RendirseUseCase.java

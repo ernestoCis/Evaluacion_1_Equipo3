@@ -10,6 +10,8 @@ import events.DisparoProcesadoEvent;
 import events.DomainEvent;
 import events.PartidaFinalizadaEvent;
 import events.PartidaSincronizadaEvent;
+import events.SolicitudAbandonarEvent;
+import events.SolicitudDisparoEvent;
 import events.TiempoTickEvent;
 import events.TurnoCambiadoEvent;
 import java.io.IOException;
@@ -37,7 +39,12 @@ public class GestorRedSocket implements ISocket {
     }
 
     private void suscribirEventosLocales(IEventSubscriber subscriber) {
+        // Eventos generados por el Cliente hacia el Servidor
         subscriber.suscribir(PartidaSincronizadaEvent.class, this::reenviarSiEsLocal);
+        subscriber.suscribir(SolicitudDisparoEvent.class, this::reenviarSiEsLocal);
+        subscriber.suscribir(SolicitudAbandonarEvent.class, this::reenviarSiEsLocal);
+
+        // Eventos autoritativos generados por el Servidor hacia el Cliente
         subscriber.suscribir(DisparoProcesadoEvent.class, this::reenviarSiEsLocal);
         subscriber.suscribir(TurnoCambiadoEvent.class, this::reenviarSiEsLocal);
         subscriber.suscribir(TiempoTickEvent.class, this::reenviarSiEsLocal);
@@ -70,7 +77,6 @@ public class GestorRedSocket implements ISocket {
     private void inicializarFlujos() throws IOException {
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
-        
         in = new ObjectInputStream(socket.getInputStream());
         activo = true;
 

@@ -1,6 +1,7 @@
-application\ControlJuego.class
 application\IControlJuego.class
-application\usecases\RendirseUseCase.class
+application\ControlJuegoServidor.class
 application\mapper\DomainMapper.class
 application\usecases\IniciarPartidaUseCase.class
 application\usecases\RealizarDisparoUseCase.class
+application\ControlJuegoCliente.class
+application\usecases\RendirseUseCase.class

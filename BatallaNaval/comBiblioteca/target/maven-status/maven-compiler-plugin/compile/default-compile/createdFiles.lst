@@ -7,10 +7,12 @@ dtos\NaveDTO.class
 dtos\ResumenFlotaDTO.class
 enums\EstadoNave.class
 events\TurnoCambiadoEvent.class
+events\SolicitudAbandonarEvent.class
 dtos\JugadorDTO.class
 enums\Orientacion.class
 events\PartidaSincronizadaEvent.class
 enums\ResultadoDisparo.class
+events\SolicitudDisparoEvent.class
 dtos\TableroDTO.class
 events\TiempoTickEvent.class
 dtos\ConteoNavesDTO.class

@@ -6,6 +6,7 @@ package events;
 
 import dtos.JugadorDTO;
 import dtos.NaveDTO;
+import dtos.ResumenFlotaDTO;
 import java.util.List;
 
 /**
@@ -15,17 +16,20 @@ import java.util.List;
 public record PartidaSincronizadaEvent(
         JugadorDTO jugadorEmisor,
         List<NaveDTO> flotaEmisor,
+        ResumenFlotaDTO resumenFlotaEmisor,
         boolean esRespuestaServidor,
         long timestamp,
         boolean esRemoto
 ) implements DomainEvent {
 
-    public PartidaSincronizadaEvent(JugadorDTO jugadorEmisor, List<NaveDTO> flotaEmisor, boolean esRespuestaServidor) {
-        this(jugadorEmisor, flotaEmisor, esRespuestaServidor, System.currentTimeMillis(), false);
+    public PartidaSincronizadaEvent(JugadorDTO jugadorEmisor, List<NaveDTO> flotaEmisor,
+                                    ResumenFlotaDTO resumenFlotaEmisor, boolean esRespuestaServidor) {
+        this(jugadorEmisor, flotaEmisor, resumenFlotaEmisor, esRespuestaServidor, System.currentTimeMillis(), false);
     }
 
     @Override
     public DomainEvent comoRemoto() {
-        return new PartidaSincronizadaEvent(jugadorEmisor, flotaEmisor, esRespuestaServidor, timestamp, true);
+        return new PartidaSincronizadaEvent(jugadorEmisor, flotaEmisor, resumenFlotaEmisor,
+                esRespuestaServidor, timestamp, true);
     }
 }
