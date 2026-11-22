@@ -1,0 +1,9 @@
+model\valueObject\Casilla.class
+model\entity\Nave.class
+model\entity\Jugador.class
+model\aggregate\Partida$1.class
+model\entity\Tablero.class
+model\valueObject\ResumenFlota.class
+model\valueObject\ConteoNaves.class
+model\valueObject\Disparo.class
+model\aggregate\Partida.class
