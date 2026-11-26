@@ -1,4 +1,16 @@
+ui\PantallaColocarNaves$3.class
+ui\PantallaColocarNaves$DibujoNave.class
+ui\PantallaColocarNaves$4.class
+ui\PantallaColocarNaves$TarjetaNave$1.class
+ui\PantallaColocarNaves$CeldaTablero$1.class
+ui\PantallaColocarNaves$CeldaTablero.class
+ui\PantallaDisparar$CasillaBoton.class
+ui\PantallaColocarNaves$TarjetaNave.class
+ui\PantallaColocarNaves.class
+ui\PantallaColocarNaves$CapaArrastre.class
 ui\PantallaDisparar$CasillaBoton$EstadoVisual.class
 ui\AlertasView.class
-ui\PantallaDisparar$CasillaBoton.class
+ui\PantallaColocarNaves$1.class
+ui\PantallaColocarNaves$2.class
 ui\PantallaDisparar.class
+ui\PantallaColocarNaves$BotonRedondeado.class

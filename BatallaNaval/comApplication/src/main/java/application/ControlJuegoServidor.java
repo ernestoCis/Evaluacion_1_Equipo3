@@ -21,6 +21,8 @@ import java.util.Collections;
 import model.aggregate.Partida;
 import model.entity.Jugador;
 import model.entity.Nave;
+import enums.Orientacion;
+import java.util.List;
 
 /**
  *
@@ -86,6 +88,27 @@ public class ControlJuegoServidor implements IControlJuego {
             if (!event.esRemoto()) return;
             rendirseUC.ejecutar(event.idJugador());
         });
+    }
+    
+    // CU Colocar Naves PENDIENTE
+    @Override
+    public void colocarNave(int idNave, int fila, int col, Orientacion orientacion) {
+        throw new UnsupportedOperationException("CU Colocar Naves: pendiente de implementar en ControlJuegoServidor");
+    }
+
+    @Override
+    public void retirarNave(int idNave) {
+        throw new UnsupportedOperationException("CU Colocar Naves: pendiente de implementar en ControlJuegoServidor");
+    }
+
+    @Override
+    public void confirmarTablero() {
+        throw new UnsupportedOperationException("CU Colocar Naves: pendiente de implementar en ControlJuegoServidor");
+    }
+
+    @Override
+    public List<NaveDTO> getFlotaLocalDTO() {
+        return DomainMapper.toFlotaDTO(partida.buscarJugadorPorId(idJugadorLocal).getTableroPropio());
     }
 
     @Override

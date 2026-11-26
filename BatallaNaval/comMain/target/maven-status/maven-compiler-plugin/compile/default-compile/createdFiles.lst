@@ -1,2 +1,4 @@
 client\MainCliente.class
 server\MainServidor.class
+preview\PreviewColocarNaves.class
+preview\PreviewColocarNaves$ControlFalso.class

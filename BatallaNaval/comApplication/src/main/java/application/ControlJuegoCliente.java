@@ -35,7 +35,7 @@ public class ControlJuegoCliente implements IControlJuego {
     private final IEventPublisher publisher;
 
     public ControlJuegoCliente(JugadorDTO jugadorLocal, List<NaveDTO> flotaLocal,
-                               IEventPublisher publisher, IEventSubscriber subscriber) {
+            IEventPublisher publisher, IEventSubscriber subscriber) {
         this.jugadorLocal = jugadorLocal;
         this.flotaLocal = List.copyOf(flotaLocal);
         this.tableroPropio = construirTableroInicial(flotaLocal);
@@ -57,7 +57,9 @@ public class ControlJuegoCliente implements IControlJuego {
     private void registrarSuscriptoresServidor(IEventSubscriber subscriber) {
         // Respuesta inicial del Servidor con datos del Jugador 1
         subscriber.suscribir(PartidaSincronizadaEvent.class, event -> {
-            if (!event.esRemoto() || !event.esRespuestaServidor()) return;
+            if (!event.esRemoto() || !event.esRespuestaServidor()) {
+                return;
+            }
             this.jugadorRival = event.jugadorEmisor();
             if (event.resumenFlotaEmisor() != null) {
                 this.resumenFlotaRival = event.resumenFlotaEmisor();
@@ -66,7 +68,9 @@ public class ControlJuegoCliente implements IControlJuego {
 
         // Resultado de cualquier disparo resuelto por el Servidor
         subscriber.suscribir(DisparoProcesadoEvent.class, event -> {
-            if (!event.esRemoto()) return;
+            if (!event.esRemoto()) {
+                return;
+            }
 
             if (event.idJugadorDisparador().equals(jugadorLocal.id())) {
                 this.jugadorLocal = new JugadorDTO(
@@ -106,6 +110,27 @@ public class ControlJuegoCliente implements IControlJuego {
             }
         }
         return new TableroDTO(estados, casillasConNave);
+    }
+
+    // CU Colocar Naves PENDD
+    @Override
+    public void colocarNave(int idNave, int fila, int col, Orientacion orientacion) {
+        throw new UnsupportedOperationException("CU Colocar Naves: pendiente de implementar en ControlJuegoCliente");
+    }
+
+    @Override
+    public void retirarNave(int idNave) {
+        throw new UnsupportedOperationException("CU Colocar Naves: pendiente de implementar en ControlJuegoCliente");
+    }
+
+    @Override
+    public void confirmarTablero() {
+        throw new UnsupportedOperationException("CU Colocar Naves: pendiente de implementar en ControlJuegoCliente");
+    }
+
+    @Override
+    public List<NaveDTO> getFlotaLocalDTO() {
+        return flotaLocal;
     }
 
     @Override

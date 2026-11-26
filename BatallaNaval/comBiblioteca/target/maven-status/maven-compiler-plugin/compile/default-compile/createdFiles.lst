@@ -13,6 +13,8 @@ enums\Orientacion.class
 events\PartidaSincronizadaEvent.class
 enums\ResultadoDisparo.class
 events\SolicitudDisparoEvent.class
+enums\ResultadoColocacion.class
+events\ColocacionActualizadaEvent.class
 dtos\TableroDTO.class
 events\TiempoTickEvent.class
 dtos\ConteoNavesDTO.class
